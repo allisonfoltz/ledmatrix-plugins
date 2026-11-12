@@ -1176,11 +1176,30 @@ class SportsCore(SportsCardOptionsMixin, SportsGameRulesMixin, SportsFetchMixin,
         carries the window's size, so managers configured with different
         windows never share a cached one too small for either.
         """
-        now = datetime.now(pytz.utc)
-        lookback = getattr(self, "schedule_lookback_days", _DEFAULT_LOOKBACK_DAYS)
-        lookahead = getattr(self, "schedule_lookahead_days", _DEFAULT_LOOKAHEAD_DAYS)
+        #ABF START: change lookback to be previous tuesday; change lookahead to be next upcoming tuesday. also take out UTC part cuz late night monday it was tuesday in utc and getting wrong stuff
+        #now = datetime.now(pytz.utc)
+        #lookback = getattr(self, "schedule_lookback_days", _DEFAULT_LOOKBACK_DAYS)
+        #lookahead = getattr(self, "schedule_lookahead_days", _DEFAULT_LOOKAHEAD_DAYS)
+        now = datetime.now()
+        if self.league == "nfl":
+            weekday_idx = 1 #tuesday because nfl weeks end monday
+        else:
+            weekday_idx = 0 #monday - i think ncaa weeks end sunday
+        lookback = weekday_idx - now.weekday()
+        if lookback > 0:
+            lookback -=7
+        lookback = abs(lookback)
+        lookahead = weekday_idx - now.weekday()
+        if lookahead <= 0:
+            lookahead +=7
+        #ABF END
         start = (now - timedelta(days=lookback)).strftime("%Y%m%d")
         end = (now + timedelta(days=lookahead)).strftime("%Y%m%d")
+        #ABF START: log the ranges
+        self.logger.info(
+            f"ABF: range is {start}-{end}. window is window_{lookback}_{lookahead}. sport is {self.sport}. league is {self.league}."
+        )
+        #ABF END
         return f"{start}-{end}", f"window_{lookback}_{lookahead}"
 
     # Class-level defaults for everything the selection path reads. __init__
