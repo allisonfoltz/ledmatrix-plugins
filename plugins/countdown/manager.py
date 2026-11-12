@@ -544,7 +544,10 @@ class CountdownPlugin(BasePlugin):
         if tz_name:
             try:
                 from zoneinfo import ZoneInfo
-                return datetime.now(ZoneInfo(tz_name)).replace(tzinfo=None)
+                #ABF START
+                #return datetime.now(ZoneInfo(tz_name)).replace(tzinfo=None)
+                return datetime.now(ZoneInfo(tz_name)).replace(tzinfo=None).date()
+                #ABF END
             except Exception:
                 if getattr(self, '_bad_tz_warned', None) != tz_name:
                     self.logger.warning(f"Invalid timezone '{tz_name}'; using system time")
@@ -622,13 +625,19 @@ class CountdownPlugin(BasePlugin):
 
     def _format_remaining(self, seconds: float) -> str:
         if seconds < 60:
-            return "NOW!"
+            #ABF
+            #return "NOW!"
+            return "TODAY!"
         if seconds < 3600:
-            return f"{int(seconds // 60)}m"
+            #ABF
+            #return f"{int(seconds // 60)}m"
+            return "TODAY!"
         if seconds < 86400:
             h = int(seconds // 3600)
             m = int((seconds % 3600) // 60)
-            return f"{h}h {m}m"
+            #ABF
+            #return f"{h}h {m}m"
+            return "TODAY!"
         if seconds < 172800:
             return "Tomorrow"
         return f"{int(seconds // 86400)} Days"
