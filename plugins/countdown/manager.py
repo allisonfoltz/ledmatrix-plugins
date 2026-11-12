@@ -572,10 +572,13 @@ class CountdownPlugin(BasePlugin):
         """
         try:
             target_time = datetime.strptime(target_time_str or "00:00", '%H:%M').time()
-            target_dt = datetime.combine(
-                datetime.strptime(target_date_str, '%Y-%m-%d').date(),
-                target_time
-            )
+            #ABF START
+            #target_dt = datetime.combine(
+                #datetime.strptime(target_date_str, '%Y-%m-%d').date(),
+                #target_time
+            #)
+            target_dt = datetime.strptime(target_date_str, '%Y-%m-%d').date()
+            #ABF END
             now = self._now()
             delta_seconds = (target_dt - now).total_seconds()
 
